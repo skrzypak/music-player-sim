@@ -1,12 +1,13 @@
 package com.polsl.player;
 
-import javax.sound.sampled.LineUnavailableException;
+import com.polsl.player.client.Client;
+
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 
 public class Main extends Thread {
 
-    public static void main(String[] args) throws IOException, InterruptedException, LineUnavailableException {
+    public static void main(String[] args) throws IOException {
         Main thread = new Main();
         thread.start();
 
@@ -15,8 +16,8 @@ public class Main extends Thread {
 
     public void run() {
         try {
-            Server.main(null);
-        } catch (IOException | ClassNotFoundException | LineUnavailableException | UnsupportedAudioFileException e) {
+            com.polsl.player.server.Main.main(null);
+        } catch (IOException | UnsupportedAudioFileException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

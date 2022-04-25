@@ -6,13 +6,29 @@ import java.io.IOException;
 import java.io.Serializable;
 
 public class MusicHeaderPackage implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
-    public File soundFile = new File("C:\\Users\\Macintosh\\IdeaProjects\\ServerSidePlayer\\assets\\wav\\file_example_WAV_10MG.wav");
-    public AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
-    public AudioFormat audioFormat = audioInputStream.getFormat();
-    public DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+    private File soundFile = new File("C:\\Users\\Konrad\\Code\\music-player-sim\\assets\\wav\\file_example_WAV_10MG.wav");
+    private AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+    private AudioFormat audioFormat = audioInputStream.getFormat();
+    private DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
 
     public MusicHeaderPackage() throws UnsupportedAudioFileException, IOException {
+    }
+
+    public File getSoundFile() {
+        return soundFile;
+    }
+
+    public AudioInputStream getAudioInputStream() {
+        return audioInputStream;
+    }
+
+    public AudioFormat getAudioFormat() {
+        return audioFormat;
+    }
+
+    public DataLine.Info getInfo() {
+        return info;
     }
 }
