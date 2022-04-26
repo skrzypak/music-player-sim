@@ -1,11 +1,11 @@
-package com.polsl.player.tcp;
+package com.polsl.player.client.example;
 
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class MusicHeaderPackage implements Serializable {
+public class AudioExample implements Serializable {
     private static final long serialVersionUID = 2L;
 
     private File soundFile = new File("C:\\Users\\Konrad\\Code\\music-player-sim\\assets\\wav\\file_example_WAV_10MG.wav");
@@ -13,7 +13,7 @@ public class MusicHeaderPackage implements Serializable {
     private AudioFormat audioFormat = audioInputStream.getFormat();
     private DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
 
-    public MusicHeaderPackage() throws UnsupportedAudioFileException, IOException {
+    public AudioExample() throws UnsupportedAudioFileException, IOException {
     }
 
     public File getSoundFile() {

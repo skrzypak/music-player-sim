@@ -1,9 +1,10 @@
 package com.polsl.player.client;
 
+import com.polsl.player.client.example.AudioExample;
+import com.polsl.player.serializable.SerializableAudioFormat;
 import com.polsl.player.server.functions.Functions;
 import com.polsl.player.tcp.ControllerEnum;
-import com.polsl.player.tcp.MusicBufferPackage;
-import com.polsl.player.tcp.MusicHeaderPackage;
+import com.polsl.player.tcp.SoundBufferPackage;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,25 +20,30 @@ public class Client {
         PrintWriter prController = new PrintWriter(sController.getOutputStream());
 
         try {
-            MusicHeaderPackage musicHeaderPackage = new MusicHeaderPackage();
+            AudioExample audioExample = new AudioExample();
+            SerializableAudioFormat saf = new SerializableAudioFormat(audioExample.getAudioFormat());
 
-            int bitRead = 0;
-            byte[] buff = new byte[MusicBufferPackage.BUFFER_SIZE];
+            // Sending audio format to server
+            OutputStream outputStream = sPlayer.getOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(saf);
 
             // Buffering music to server
+            int bitRead = 0;
+            byte[] buff = new byte[SoundBufferPackage.BUFFER_SIZE];
 
             prController.println(Functions.toString(ControllerEnum.START));
             prController.flush();
 
             while (bitRead != -1) {
-                bitRead = musicHeaderPackage.getAudioInputStream().read(buff, 0, buff.length);
+                bitRead = audioExample.getAudioInputStream().read(buff, 0, buff.length);
                 if (bitRead >= 0) {
-                    MusicBufferPackage msg = new MusicBufferPackage(buff, bitRead);
+                    SoundBufferPackage msg = new SoundBufferPackage(buff, bitRead);
                     prPlayer.println(Functions.toString(msg));
                     prPlayer.flush();
                 }
 
-                // TODO For test only
+                // TODO For test controller only
                 if(Instant.now().getEpochSecond() % 3 == 0) {
                     prController.println(Functions.toString(ControllerEnum.PAUSE));
                     prController.flush();
@@ -46,7 +52,6 @@ public class Client {
                     prController.flush();
                 }
 
-                //TODO Delay
                 TimeUnit.MILLISECONDS.sleep(100);
             }
         } catch (Exception e) {

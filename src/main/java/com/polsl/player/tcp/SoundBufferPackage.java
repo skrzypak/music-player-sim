@@ -1,15 +1,17 @@
 package com.polsl.player.tcp;
 
+import java.io.Serial;
 import java.io.Serializable;
 
-public class MusicBufferPackage implements Serializable {
+public class SoundBufferPackage implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     public static final int BUFFER_SIZE = 32*1024;
 
     private byte[] arrBuff = null;
     private int numOfBytesRead = -1;
 
-    public MusicBufferPackage(byte[] arrBuff, int numOfBytesRead) {
+    public SoundBufferPackage(byte[] arrBuff, int numOfBytesRead) {
         this.arrBuff = arrBuff;
         this.numOfBytesRead = numOfBytesRead;
     }
