@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class AudioExample implements Serializable {
     private static final long serialVersionUID = 2L;
 
-    private File soundFile = new File("C:\\Users\\Konrad\\Code\\music-player-sim\\assets\\wav\\file_example_WAV_10MG.wav");
+    private File soundFile = new File(getClass().getResource("/wav/file_example_WAV_10MG.wav").getPath());
     private AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
     private AudioFormat audioFormat = audioInputStream.getFormat();
     private DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
