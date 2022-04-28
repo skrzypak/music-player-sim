@@ -1,10 +1,8 @@
 package com.polsl.player.tcp;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 public class SoundBufferPackage implements Serializable {
-    @Serial
     private static final long serialVersionUID = 1L;
     public static final int BUFFER_SIZE = 32*1024;
 

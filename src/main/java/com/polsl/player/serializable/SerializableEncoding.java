@@ -5,7 +5,6 @@ import java.io.*;
 
 public class SerializableEncoding implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     transient Encoding encoding;
@@ -18,13 +17,11 @@ public class SerializableEncoding implements Serializable {
         return this.encoding;
     }
 
-    @Serial
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
         out.writeObject(getEncodingName());
     }
 
-    @Serial
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         encoding = new Encoding((String) in.readObject());
