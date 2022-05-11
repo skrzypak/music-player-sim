@@ -1,17 +1,18 @@
 package com.polsl.player.server.sockets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polsl.player.serializable.SerializableAudioFormat;
 import com.polsl.player.server.functions.Functions;
 import com.polsl.player.tcp.SoundBufferPackage;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
+import java.util.Base64;
 
 public class Player extends Socket implements Runnable  {
 
     private SourceDataLine soundLine = null;
+    ObjectMapper mapper = new ObjectMapper();
 
     public Player() throws IOException {
         super(6666, "PLAYER");
@@ -30,11 +31,10 @@ public class Player extends Socket implements Runnable  {
 
                     System.out.println("SERVER::"  + this.getName() + " -> WAITING FOR THE AUDIO FORMAT");
 
-                    InputStream inputStream = this.getSocket().getInputStream();
-                    ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-                    SerializableAudioFormat serializableAudioFormat = (SerializableAudioFormat) objectInputStream.readObject();
+                    String headerJson = convertFromBase64(getBufferedReader().readLine());
+                    SerializableAudioFormat serializableAudioFormat = mapper.readValue(headerJson, SerializableAudioFormat.class);
+                    AudioFormat audioFormat = serializableAudioFormat.convertToAudioFormat();
 
-                    AudioFormat audioFormat = serializableAudioFormat.getAf();
                     DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
 
                     System.out.println("SERVER::"  + this.getName() + " -> GETTING AUDIO FORMAT");
@@ -47,8 +47,8 @@ public class Player extends Socket implements Runnable  {
                     System.out.println("SERVER::"  + this.getName() + " -> START MUSIC PLAY");
 
                     while(true) {
-                        SoundBufferPackage soundBufferPackage = (SoundBufferPackage)
-                                Functions.fromString(getBufferedReader().readLine());
+                        String dataJson = convertFromBase64(getBufferedReader().readLine());
+                        SoundBufferPackage soundBufferPackage = mapper.readValue(dataJson, SoundBufferPackage.class);
                         int nBytesRead = soundBufferPackage.getNumOfBytesRead();
 
                         if (nBytesRead >= 0) {
@@ -58,8 +58,7 @@ public class Player extends Socket implements Runnable  {
                             break;
                         }
                     }
-
-                } catch (IOException | ClassNotFoundException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 } catch (LineUnavailableException e) {
                     throw new RuntimeException(e);
@@ -75,5 +74,9 @@ public class Player extends Socket implements Runnable  {
             System.out.println("SERVER::" + this.getName() + " -> CLIENT CONNECTION LOSE");
 
         }
+    }
+
+    private String convertFromBase64(String encodedString) {
+        return new String(Base64.getDecoder().decode(encodedString));
     }
 }

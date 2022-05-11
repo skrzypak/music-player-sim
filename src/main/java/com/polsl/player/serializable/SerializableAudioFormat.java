@@ -1,37 +1,65 @@
 package com.polsl.player.serializable;
 
 import javax.sound.sampled.AudioFormat;
-import java.io.*;
 
-public class SerializableAudioFormat implements Serializable {
+public class SerializableAudioFormat {
 
     private static final long serialVersionUID = 1L;
 
     transient AudioFormat format;
+    private String encoding;
+    private float sampleRate;
+    private int sampleSizeInBits;
+    private int channels;
+    private int frameSize;
+    private float frameRate;
+    private boolean bigEndian;
+
+    public SerializableAudioFormat() {
+    }
 
     public SerializableAudioFormat(AudioFormat format) {
         this.format = format;
     }
 
-    public AudioFormat getAf() {
-        return this.format;
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
-        out.writeObject(new SerializableEncoding(format.getEncoding()));
-        out.writeFloat(format.getSampleRate());
-        out.writeInt(format.getSampleSizeInBits());
-        out.writeInt(format.getChannels());
-        out.writeInt(format.getFrameSize());
-        out.writeFloat(format.getFrameRate());
-        out.writeBoolean(format.isBigEndian());
+    public AudioFormat getFormat() {
+        return format;
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        format = new AudioFormat(((SerializableEncoding) in.readObject()).getEncoding(), in.readFloat(), in.readInt(),
-                in.readInt(), in.readInt(), in.readFloat(), in.readBoolean());
+    public String getEncoding() {
+        return encoding;
     }
 
+    public float getSampleRate() {
+        return sampleRate;
+    }
+
+    public int getSampleSizeInBits() {
+        return sampleSizeInBits;
+    }
+
+    public int getChannels() {
+        return channels;
+    }
+
+    public int getFrameSize() {
+        return frameSize;
+    }
+
+    public float getFrameRate() {
+        return frameRate;
+    }
+
+    public boolean isBigEndian() {
+        return bigEndian;
+    }
+
+    public AudioFormat convertToAudioFormat() {
+        return new AudioFormat(new AudioFormat.Encoding(encoding), sampleRate, sampleSizeInBits, channels, frameSize,
+                frameRate, bigEndian);
+    }
 }

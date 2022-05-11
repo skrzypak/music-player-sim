@@ -9,6 +9,9 @@ public class SoundBufferPackage implements Serializable {
     private byte[] arrBuff = null;
     private int numOfBytesRead = -1;
 
+    public SoundBufferPackage() {
+    }
+
     public SoundBufferPackage(byte[] arrBuff, int numOfBytesRead) {
         this.arrBuff = arrBuff;
         this.numOfBytesRead = numOfBytesRead;
