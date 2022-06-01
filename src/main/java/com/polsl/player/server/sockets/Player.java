@@ -47,15 +47,18 @@ public class Player extends Socket implements Runnable  {
                     System.out.println("SERVER::"  + this.getName() + " -> START MUSIC PLAY");
 
                     while(true) {
-                        String dataJson = convertFromBase64(getBufferedReader().readLine());
-                        SoundBufferPackage soundBufferPackage = mapper.readValue(dataJson, SoundBufferPackage.class);
-                        int nBytesRead = soundBufferPackage.getNumOfBytesRead();
+                        String line = getBufferedReader().readLine();
+                        if (line != null) {
+                            String dataJson = convertFromBase64(line);
+                            SoundBufferPackage soundBufferPackage = mapper.readValue(dataJson, SoundBufferPackage.class);
+                            int nBytesRead = soundBufferPackage.getNumOfBytesRead();
 
-                        if (nBytesRead >= 0) {
-                            soundLine.write(soundBufferPackage.getArrBuff(), 0, nBytesRead);
-                            System.out.println("SERVER::"  + this.getName() + " -> BUFFER OF SOUND HAS WRITTEN");
-                        } else {
-                            break;
+                            if (nBytesRead >= 0) {
+                                soundLine.write(soundBufferPackage.getArrBuff(), 0, nBytesRead);
+                                System.out.println("SERVER::"  + this.getName() + " -> BUFFER OF SOUND HAS WRITTEN");
+                            } else {
+                                break;
+                            }
                         }
                     }
                 } catch (IOException e) {
