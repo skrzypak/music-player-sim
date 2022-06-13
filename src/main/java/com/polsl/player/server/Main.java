@@ -1,6 +1,5 @@
 package com.polsl.player.server;
 
-import com.polsl.player.server.sockets.Controller;
 import com.polsl.player.server.sockets.Player;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -11,13 +10,11 @@ import java.util.List;
 public class Main extends Thread {
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException, InterruptedException {
         Player player = new Player();
-        Controller controller = new Controller();
 
         List<Runnable> runners = new ArrayList<>();
         List<Thread> threads = new ArrayList<>();
 
         runners.add(player);
-        runners.add(controller);
 
         for (Runnable runner : runners) {
             threads.add(new Thread(runner));

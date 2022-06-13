@@ -9,12 +9,15 @@ public class SoundBufferPackage implements Serializable {
     private byte[] arrBuff = null;
     private int numOfBytesRead = -1;
 
+    private boolean songChange = false;
+
     public SoundBufferPackage() {
     }
 
-    public SoundBufferPackage(byte[] arrBuff, int numOfBytesRead) {
+    public SoundBufferPackage(byte[] arrBuff, int numOfBytesRead,  boolean songChange) {
         this.arrBuff = arrBuff;
         this.numOfBytesRead = numOfBytesRead;
+        this.songChange = songChange;
     }
 
     public byte[] getArrBuff() {
@@ -23,5 +26,9 @@ public class SoundBufferPackage implements Serializable {
 
     public int getNumOfBytesRead() {
         return numOfBytesRead;
+    }
+
+    public boolean isSongChange() {
+        return songChange;
     }
 }

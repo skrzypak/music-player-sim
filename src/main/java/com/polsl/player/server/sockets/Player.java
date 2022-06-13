@@ -51,6 +51,11 @@ public class Player extends Socket implements Runnable  {
                         if (line != null) {
                             String dataJson = convertFromBase64(line);
                             SoundBufferPackage soundBufferPackage = mapper.readValue(dataJson, SoundBufferPackage.class);
+
+                            if (soundBufferPackage.isSongChange()) {
+                                break;
+                            }
+
                             int nBytesRead = soundBufferPackage.getNumOfBytesRead();
 
                             if (nBytesRead >= 0) {
@@ -66,8 +71,10 @@ public class Player extends Socket implements Runnable  {
                 } catch (LineUnavailableException e) {
                     throw new RuntimeException(e);
                 } finally {
-                    soundLine.drain();
-                    soundLine.close();
+                    if(this.soundLine != null) {
+                        soundLine.drain();
+                        soundLine.close();
+                    }
                     System.out.println("SERVER::"  + this.getName() + " -> MUSIC PLAY FINISHED");
                 }
 
