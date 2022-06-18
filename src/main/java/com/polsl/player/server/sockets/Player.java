@@ -13,6 +13,7 @@ public class Player extends Socket implements Runnable  {
 
     private SourceDataLine soundLine = null;
     ObjectMapper mapper = new ObjectMapper();
+    private boolean shouldCloseSocket = false;
 
     public Player() throws IOException {
         super(6666, "PLAYER");
@@ -21,6 +22,7 @@ public class Player extends Socket implements Runnable  {
     @Override
     public void run() {
         while (true) {
+            shouldCloseSocket = false;
 
             while (!isEstablished()) {
                 Functions.threadSleep(1000);
@@ -28,43 +30,52 @@ public class Player extends Socket implements Runnable  {
 
             while(isEstablished()) {
                 try {
-
+                    shouldCloseSocket = false;
                     System.out.println("SERVER::"  + this.getName() + " -> WAITING FOR THE AUDIO FORMAT");
+                    String headerLine = getBufferedReader().readLine();
+                    if (headerLine != null) {
+                        String headerJson = convertFromBase64(headerLine);
+                        SerializableAudioFormat serializableAudioFormat = mapper.readValue(headerJson, SerializableAudioFormat.class);
+                        AudioFormat audioFormat = serializableAudioFormat.convertToAudioFormat();
 
-                    String headerJson = convertFromBase64(getBufferedReader().readLine());
-                    SerializableAudioFormat serializableAudioFormat = mapper.readValue(headerJson, SerializableAudioFormat.class);
-                    AudioFormat audioFormat = serializableAudioFormat.convertToAudioFormat();
+                        DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
 
-                    DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+                        System.out.println("SERVER::"  + this.getName() + " -> GETTING AUDIO FORMAT");
 
-                    System.out.println("SERVER::"  + this.getName() + " -> GETTING AUDIO FORMAT");
+                        soundLine = (SourceDataLine) AudioSystem.getLine(info);
+                        soundLine.open(audioFormat);
 
-                    soundLine = (SourceDataLine) AudioSystem.getLine(info);
-                    soundLine.open(audioFormat);
+                        soundLine.start();
 
-                    soundLine.start();
+                        System.out.println("SERVER::"  + this.getName() + " -> START MUSIC PLAY");
 
-                    System.out.println("SERVER::"  + this.getName() + " -> START MUSIC PLAY");
+                        while(true) {
+                            String line = getBufferedReader().readLine();
+                            if (line != null) {
+                                String dataJson = convertFromBase64(line);
+                                SoundBufferPackage soundBufferPackage = mapper.readValue(dataJson, SoundBufferPackage.class);
 
-                    while(true) {
-                        String line = getBufferedReader().readLine();
-                        if (line != null) {
-                            String dataJson = convertFromBase64(line);
-                            SoundBufferPackage soundBufferPackage = mapper.readValue(dataJson, SoundBufferPackage.class);
+                                int nBytesRead = soundBufferPackage.getNumOfBytesRead();
 
-                            if (soundBufferPackage.isSongChange()) {
-                                break;
-                            }
+                                if (nBytesRead >= 0) {
+                                    soundLine.write(soundBufferPackage.getArrBuff(), 0, nBytesRead);
+                                    System.out.println("SERVER::"  + this.getName() + " -> BUFFER OF SOUND HAS WRITTEN");
+                                } else {
+                                    break;
+                                }
 
-                            int nBytesRead = soundBufferPackage.getNumOfBytesRead();
-
-                            if (nBytesRead >= 0) {
-                                soundLine.write(soundBufferPackage.getArrBuff(), 0, nBytesRead);
-                                System.out.println("SERVER::"  + this.getName() + " -> BUFFER OF SOUND HAS WRITTEN");
-                            } else {
-                                break;
+                                if (soundBufferPackage.isSongChange()) {
+                                    shouldCloseSocket = true;
+                                    break;
+                                }
                             }
                         }
+                        if (shouldCloseSocket) {
+                            establish();
+                            break;
+                        }
+                    } else {
+                        Functions.threadSleep(1000);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -77,12 +88,9 @@ public class Player extends Socket implements Runnable  {
                     }
                     System.out.println("SERVER::"  + this.getName() + " -> MUSIC PLAY FINISHED");
                 }
-
                 Functions.threadSleep(1000);
             }
-
             System.out.println("SERVER::" + this.getName() + " -> CLIENT CONNECTION LOSE");
-
         }
     }
 
