@@ -17,7 +17,7 @@ public abstract class Socket implements ISocket {
         this.name = name;
     }
 
-    private Boolean establish() {
+    public Boolean establish() {
         try {
             this.s = this.ss.accept();
             this.in = new InputStreamReader(this.s.getInputStream());
